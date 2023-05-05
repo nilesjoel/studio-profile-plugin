@@ -8,7 +8,7 @@
 module.exports = ({ strapi }) => {
 
     const find = async () => {
-        const entity = await strapi.entityService.findMany('plugin::studio-artist.menu', {
+        const entity = await strapi.entityService.findMany('plugin::studio-profile.menu', {
             populate: '*'
         })
         const menuEntities = [];

@@ -7,7 +7,7 @@
 
 module.exports = ({ strapi }) => {
 
-    const menuService = strapi.plugin("studio-artist").service("menuService");
+    const menuService = strapi.plugin("studio-profile").service("menuService");
 
     const find = async (ctx) => {
         const { body } = ctx.request;

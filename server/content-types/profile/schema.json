@@ -43,7 +43,7 @@
     "menus": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "plugin::studio-artist.menu",
+      "target": "plugin::studio-profile.menu",
       "mappedBy": "profile"
     },
     "schemaMetadata": {

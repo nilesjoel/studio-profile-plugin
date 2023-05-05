@@ -1,0 +1,55 @@
+{
+  "kind": "collectionType",
+  "collectionName": "profiles",
+  "info": {
+    "singularName": "profile",
+    "pluralName": "profiles",
+    "displayName": "Profile",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false,
+    "comment": ""
+  },
+  "attributes": {
+    "identifier": {
+      "type": "uid",
+      "targetField": "name",
+      "required": false
+    },
+    "active": {
+      "type": "boolean"
+    },
+    "description": {
+      "type": "richtext"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "firstLogin": {
+      "type": "datetime"
+    },
+    "lastLogin": {
+      "type": "datetime"
+    },
+    "loginCount": {
+      "type": "biginteger"
+    },
+    "name": {
+      "type": "string"
+    },
+    "schemaMetadata": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::studio-profile.schema-metadata",
+      "mappedBy": "profile"
+    },
+    "tags": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::studio-profile.tag"
+    }
+  }
+}

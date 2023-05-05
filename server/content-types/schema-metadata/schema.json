@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "schema-metadata",
+  "info": {
+    "singularName": "schema-metadata",
+    "pluralName": "schema-metadata-elements",
+    "displayName": "Schema Metadata",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false,
+    "comment": ""
+  },
+  "attributes": {
+    "fieldName": {
+      "type": "string"
+    },
+    "editable": {
+      "type": "boolean"
+    },
+    "fieldLabel": {
+      "type": "string"
+    },
+    "required": {
+      "type": "boolean"
+    },
+    "tableName": {
+      "type": "string"
+    },
+    "fieldType": {
+      "type": "string"
+    },
+    "validators": {
+      "type": "json"
+    },
+    "options": {
+      "type": "json"
+    },
+    "profile": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::studio-profile.profile",
+      "inversedBy": "schemaMetadata"
+    },
+    "fieldOrder": {
+      "type": "integer"
+    },
+    "gridSize": {
+      "type": "decimal"
+    }
+  }
+}

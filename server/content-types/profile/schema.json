@@ -40,6 +40,12 @@
     "name": {
       "type": "string"
     },
+    "menus": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::studio-artist.menu",
+      "mappedBy": "profile"
+    },
     "schemaMetadata": {
       "type": "relation",
       "relation": "oneToMany",

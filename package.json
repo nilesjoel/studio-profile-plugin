@@ -1,10 +1,10 @@
 {
   "name": "@studiosymmetries/studio-profile",
-  "version": "0.0.2",
-  "description": "This is the description of the plugin.",
+  "version": "0.0.3",
+  "description": "A plugin for accessing Studio Profile data.",
   "strapi": {
     "name": "studio-profile",
-    "description": "Description of Studio Profile plugin",
+    "description": "This is a plugin designed to access Studio Profile data.",
     "kind": "plugin",
     "displayName": "Studio Profile"
   },

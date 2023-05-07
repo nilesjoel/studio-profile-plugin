@@ -55,11 +55,13 @@ module.exports = ({ strapi }) => {
 
     const getProfile = async (ctx) => {
 
-        console.log("GETSTUDIOPROFILE-------------")
         // console.log(ctx.request.body)
 
         const token = ctx.request.body;
         const { jwt } = token;
+        
+        console.log("GETSTUDIOPROFILE-------------", {token})
+        console.log(chalk.green(JSON.stringify({jwt})))
         const verifiedUser = await strapi.plugins['users-permissions'].services.jwt.verify(jwt);
 
         // const studioProfile = await verifyProfile(ctx);
@@ -160,7 +162,7 @@ module.exports = ({ strapi }) => {
         const { user, token } = ctx.request.body;
         const verified = await strapi.plugins['users-permissions'].services.jwt.verify(token.jwt);
 
-        // console.log("PROFILE_SERVICE", { user, token, verified })
+        console.log("PROFILE_SERVICE", { user, token, verified })
 
         if (user.email) {
             if (user.email === token.email) {

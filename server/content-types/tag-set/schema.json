@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tag_sets",
+  "info": {
+    "singularName": "tag-set",
+    "pluralName": "tag-sets",
+    "displayName": "Tag Set",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "tags": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::studio-profile.tag"
+    },
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "uid"
+    }
+  }
+}

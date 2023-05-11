@@ -8,8 +8,7 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": false,
-    "comment": ""
+    "draftAndPublish": false
   },
   "attributes": {
     "identifier": {
@@ -43,8 +42,7 @@
     "menus": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "plugin::studio-profile.menu",
-      "mappedBy": "profile"
+      "target": "plugin::studio-profile.menu"
     },
     "schemaMetadata": {
       "type": "relation",
@@ -52,10 +50,10 @@
       "target": "plugin::studio-profile.schema-metadata",
       "mappedBy": "profile"
     },
-    "tags": {
+    "website": {
       "type": "relation",
-      "relation": "oneToMany",
-      "target": "plugin::studio-profile.tag"
+      "relation": "oneToOne",
+      "target": "plugin::studio-website.website"
     }
   }
 }

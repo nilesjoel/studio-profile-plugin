@@ -7,6 +7,9 @@
 
 module.exports = ({ strapi }) => {
 
+    const profileQuery = strapi.db.query('plugin::studio-profile.profile');
+
+
     const find = async () => {
         const entity = await strapi.entityService.findMany('plugin::studio-profile.menu', {
             populate: '*'
@@ -27,21 +30,24 @@ module.exports = ({ strapi }) => {
             //adding a default sort
             // params = params ?? {};
             // params["orderBy"] = "title";
-            const menuEntities = await strapi.entityService.findMany('plugin::studio-profile.menu', {
-                populate: ['profile'],
-                filters: { profile: { user: { email: { $eq: token.email } } } },
-                sort: { order: 'asc' },
+            // const menuEntities = await strapi.entityService.findOne('plugin::studio-profile.profile', {
+            //     populate: ['menus'],
+            //     filters: { user: { email: { $eq: token.email } } },
+            // });
+            const studioProfile = await profileQuery.findOne({
+                where: { user: { email: token.email } },
+                populate: ['menus'],
             });
 
             console.log("findMenuByProfile: ------------------------------------------------menuEntities");
-            console.log(menuEntities.length)
-            console.log(JSON.stringify(menuEntities, null, 2));
-            
-            if (menuEntities.length > 0) {
-                return menuEntities
-            } else {
-                return menuEntities.data
-            }
+            // console.log(menuEntities.menus.length)
+            // console.log(JSON.stringify(menuEntities, null, 2));
+            console.log({studioProfile})
+            // if (menuEntities.length > 0) {
+                return studioProfile.menus
+            // } else {
+                // return menuEntities.data
+            // }
         }
         catch (exp) {
             throw new Error(`Social Profile Menu Service: findMenuByProfile: ${exp.message}`);

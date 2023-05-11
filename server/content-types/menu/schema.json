@@ -24,17 +24,23 @@
     "slug": {
       "type": "string"
     },
+    "context": {
+      "type": "json"
+    },
+    "order": {
+      "type": "integer"
+    },
     "profile": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "plugin::studio-profile.profile",
       "inversedBy": "menus"
     },
-    "context": {
-      "type": "json"
-    },
-    "order": {
-      "type": "integer"
+    "websites": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::studio-website.website",
+      "mappedBy": "menus"
     }
   }
 }

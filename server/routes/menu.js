@@ -6,9 +6,9 @@
 
  module.exports = [
     {
-      method: 'GET',
-      path: '/menu',
-      handler: 'menuController.find',
+      method: 'POST',
+      path: '/menu/profile',
+      handler: 'menuController.findMenuByProfile',
       config: {
         auth: false
       }

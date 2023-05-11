@@ -26,5 +26,13 @@ module.exports = ({ strapi }) => {
         }
     }
 
-    return { find, findOne }
+    const findMenuByProfile = async (ctx) => {
+        const { body } = ctx.request;
+        try {
+            ctx.body = await menuService.findMenuByProfile(ctx);
+        } catch (err) {
+            ctx.throw(500, err);
+        }
+    }
+    return { find, findOne, findMenuByProfile }
 };

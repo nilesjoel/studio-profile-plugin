@@ -32,6 +32,9 @@
     },
     "context": {
       "type": "json"
+    },
+    "order": {
+      "type": "integer"
     }
   }
 }

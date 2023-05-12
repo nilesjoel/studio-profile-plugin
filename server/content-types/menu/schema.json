@@ -8,15 +8,11 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": false,
-    "comment": ""
+    "draftAndPublish": false
   },
   "attributes": {
     "title": {
       "type": "string"
-    },
-    "uid": {
-      "type": "uid"
     },
     "public": {
       "type": "boolean"
@@ -30,17 +26,14 @@
     "order": {
       "type": "integer"
     },
-    "profile": {
+    "website": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "plugin::studio-profile.profile",
+      "target": "plugin::studio-website.website",
       "inversedBy": "menus"
     },
-    "websites": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "plugin::studio-website.website",
-      "mappedBy": "menus"
+    "name": {
+      "type": "string"
     }
   }
 }

@@ -22,10 +22,23 @@ module.exports = ({ strapi }) => {
     const verifyStudioProfile = async (ctx) => {
         console.log(ctx.request.body)
         console.log("VERIFY STUDIO PROFILE CONTROLLER", "------------------------") //{ ctx })
+
+        const { token } = ctx.request.body;
+        console.log({token})
+
+        // Identify Site
+
+        // Identify Profile
+
+        // Verify Profile
         ctx.body = await profileService.verifyProfile(ctx)
     }
     const createStudioProfile = async (ctx) => {
         console.log("CREATE STUDIO PROFILE CONTROLLER", "------------------------") // { ctx })
+     
+
+     
+     
         ctx.body = await profileService.createOrUpdate(ctx);
     }
 

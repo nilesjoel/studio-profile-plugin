@@ -26,9 +26,9 @@
     "order": {
       "type": "integer"
     },
-    "websites": {
+    "website": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "manyToOne",
       "target": "plugin::studio-website.website",
       "inversedBy": "menus"
     },

@@ -54,6 +54,10 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "plugin::studio-website.website"
+    },
+    "uid": {
+      "type": "uid",
+      "targetField": "name"
     }
   }
 }

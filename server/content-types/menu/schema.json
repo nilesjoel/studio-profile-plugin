@@ -26,17 +26,15 @@
     "order": {
       "type": "integer"
     },
-    "website": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "plugin::studio-website.website",
-      "inversedBy": "menus"
-    },
     "name": {
       "type": "string"
     },
     "context": {
       "type": "string"
+    },
+    "uid": {
+      "type": "uid",
+      "targetField": "title"
     }
   }
 }

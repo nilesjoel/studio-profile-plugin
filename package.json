@@ -1,6 +1,6 @@
 {
   "name": "@studiosymmetries/studio-profile",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "A plugin for accessing Studio Profile data.",
   "strapi": {
     "name": "studio-profile",

@@ -25,29 +25,31 @@ module.exports = ({ strapi }) => {
 
     const findMenuByProfile = async (ctx) => {
         const { token } = ctx.request.body;
-        console.log("findMenuByProfile: ------------------------------------------------", JSON.stringify(token));
+        console.log("findMenuByProfile: ------------------------------------------------", { token });
         try {
             //adding a default sort
             // params = params ?? {};
             // params["orderBy"] = "title";
-            // const menuEntities = await strapi.entityService.findOne('plugin::studio-profile.profile', {
-            //     populate: ['menus'],
-            //     filters: { user: { email: { $eq: token.email } } },
-            // });
-            const studioProfile = await profileQuery.findOne({
-                where: { user: { email: token.email } },
-                populate: ['menus'],
+            
+            const studioProfile = await profileQuery.findMany({
+                populate: ['menus', 'website'],
+                where: {
+                    user: { email: token.email },
+                    website: { uid: token.site }
+                },
+                
             });
 
-            console.log("findMenuByProfile: ------------------------------------------------menuEntities");
+            console.log(`findMenuByProfile: [site:${token.site}] [email:${token.email}]------------------------------------------------menuEntities`);
             // console.log(menuEntities.menus.length)
             // console.log(JSON.stringify(menuEntities, null, 2));
-            console.log({studioProfile})
+            console.log({ "MENUS":studioProfile[0].menus })
             // if (menuEntities.length > 0) {
-                return studioProfile.menus
+                return studioProfile[0].menus
             // } else {
-                // return menuEntities.data
+            //     return menuEntities.data
             // }
+            return {};
         }
         catch (exp) {
             throw new Error(`Social Profile Menu Service: findMenuByProfile: ${exp.message}`);

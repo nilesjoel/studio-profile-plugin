@@ -59,41 +59,39 @@ module.exports = ({ strapi }) => {
 
         const token = ctx.request.body;
         const { jwt } = token;
-        
-        console.log("GETSTUDIOPROFILE-------------", {token})
-        console.log(chalk.green(JSON.stringify({jwt})))
+
+        console.log("GETSTUDIOPROFILE-------------", { token })
+        console.log(chalk.green(JSON.stringify({ jwt })))
         const verifiedUser = await strapi.plugins['users-permissions'].services.jwt.verify(jwt);
 
         // const studioProfile = await verifyProfile(ctx);
         if (verifiedUser) {
-            const studioProfile = await profileQuery.findOne({
-                where: { user: { email: token.email } },
-                populate: {
-                    user: true,
-                    social: {
-                        populate: ['studio_social_posts', 'studio_social_campaigns', 'studio_social_channels']
+            console.log("VERIFIED USER", {verifiedUser})
+            try{
+                const studioProfile = await profileQuery.findMany({
+                    where: { 
+                      $and: [
+                        { user: { email: token.email } },
+                        { website: { uid: token.site } }] 
                     },
-                    breath: {
-                        populate: {
-                            'breathwork_studio_workouts': {
-                                populate: ['routines']
-                            },
-                            'breathwork_studio_routines': true
-                        }
+                    populate: {
+                        user: true,
+                        menus : true,
+                        website: true
                     },
-                    market: {
-                        populate: ['studio_market_carts', 'studio_market_orders']
-                    },
-                    poetry: {
-                        populate: ['poetic_notion_entries']
-                    },
-                },
-            });
-            const profileData = await studioProfile;
-
-            console.log({ jwt, token })
-            console.log({ profileData });
-            return profileData;
+                });
+                const profileData = await studioProfile;
+    
+                // console.log({ jwt, token })
+                console.log({ 
+                    tokenSite: token.site, 
+                    profileData, 
+                    // website : profileData.website
+                  });
+                return profileData[0];
+            }catch(err){
+                console.error(err)
+            }
 
         } else {
             return { error: "Invalid Token" }

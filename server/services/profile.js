@@ -1,9 +1,9 @@
 'use strict';
 
 // TODO: TESTING MAGIC LINK for [Studio Profile] Verification -----
-const { Magic } = require('@magic-sdk/admin');
+// const { Magic } = require('@magic-sdk/admin');
 
-const mAdmin = new Magic(process.env.MAGIC_SECRET_API_KEY); // ✨
+// const mAdmin = new Magic(process.env.MAGIC_SECRET_API_KEY); // ✨
 
 const _ = require('lodash');
 const { DateTime, Duration } = require("luxon");

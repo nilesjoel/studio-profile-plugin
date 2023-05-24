@@ -1,231 +1,339 @@
 'use strict';
 
+// TODO: TESTING MAGIC LINK for [Studio Profile] Verification -----
+const { Magic } = require('@magic-sdk/admin');
+
+const mAdmin = new Magic(process.env.MAGIC_SECRET_API_KEY); // ✨
+
 const _ = require('lodash');
 const { DateTime, Duration } = require("luxon");
-
-
-const chalk = require('chalk');
-
+// EMD TESTING MAGIC LINK for [Studio Profile] Verification -----
 
 /**
  *  service
  */
 
+const chalk = require('chalk');
+
+const error = chalk.bold.red;
+const warning = chalk.keyword('orange');
+const profileWarn = chalk.keyword('pink'); // Orange color
+
+
 module.exports = ({ strapi }) => {
 
     const profileQuery = strapi.db.query('plugin::studio-profile.profile');
     const userQuery = strapi.db.query('plugin::users-permissions.user');
+    const websiteQuery = strapi.db.query('plugin::studio-website.website');
 
-    const error = chalk.bold.red;
-    const warning = chalk.keyword('orange');
-
-    const getWelcomeMessage = async (ctx) => {
-        const user = await userQuery.findOne({
-            select: '*',
-            where: { email: 'me@nileswhite.com' },
-            populate: { category: true },
-        });
-
-        console.log({ user })
-
-        warning("Welcome to You");
-
-        return user;
-    }
+    // TODO: REMOVE or REPLACE with useable code.
+    // Potentially use this to list available services.
     const index = async (ctx) => {
-        console.log({ ctx })
-        return "Welcome to You";
-    }
-
-    const getUserProfile = async (userEmail) => {
-
-        try {
-
-            const studioProfile = await profileQuery.findOne({
-                where: { user: { email: token.email } }
-            });
-            const profileData = await studioProfile;
-
-        } catch (err) {
-            console.error(err)
-        }
+        return {
+            apiDetail: "Studio Profile : Services Index",
+            ctx
+        };
     }
 
 
 
-    const getProfile = async (ctx) => {
-
-        // console.log(ctx.request.body)
-
-        const token = ctx.request.body;
-        const { jwt } = token;
-
-        console.log("GETSTUDIOPROFILE-------------", { token })
-        console.log(chalk.green(JSON.stringify({ jwt })))
+    const getProfile = async ({ token }) => {
+        // console.log("getProfile::", { token })
+        const { jwt, email } = token;
+        // Verify User Token
         const verifiedUser = await strapi.plugins['users-permissions'].services.jwt.verify(jwt);
+        // console.log("VERIFIED USER", { verifiedUser, jwt, email });
 
-        // const studioProfile = await verifyProfile(ctx);
+        // Find Website Profile
         if (verifiedUser) {
-            console.log("VERIFIED USER", {verifiedUser})
-            try{
+            // console.log("getProfile:: ", { email })
+            // const studioUser = await getStudioUser(email);
+            // console.log("STUDIO USER", { email, studioUser })
+            // If User Token is Valid, find Studio Profile
+            try {
                 const studioProfile = await profileQuery.findMany({
-                    where: { 
-                      $and: [
-                        { user: { email: token.email } },
-                        { website: { uid: token.site } }] 
+                    where: {
+                        $and: [
+                            { user: { email: token.email } },
+                            { website: { uid: token.site } }]
                     },
                     populate: {
                         user: true,
-                        menus : true,
+                        menus: true,
                         website: true
                     },
                 });
-                const profileData = await studioProfile;
-    
-                // console.log({ jwt, token })
-                console.log({ 
-                    tokenSite: token.site, 
-                    profileData, 
-                    // website : profileData.website
-                  });
+                const profileData = await studioProfile; // TODO:: what EXACTLY is happening here?
+
+                // In case there are multiple profiles, there should not be.
+                if (profileData.length > 1) {
+                    // TODO : Delete all profiles but the one with the most recent login.
+                }
+
+                // Test : Logging
+                // console.log(profileWarn("GET PROFILE::==", { profileData, studioProfile }));
+
                 return profileData[0];
-            }catch(err){
-                console.error(err)
+            } catch (err) {
+                throw new NotFoundError("Profile Not Found", "GET_PROFILE--------", { err })
             }
 
         } else {
-            return { error: "Invalid Token" }
+            throw new UnauthorizedError("Invalid Token", "GET_PROFILE", { verifiedUser })
         }
     }
 
-    const createOrUpdate = async (user, { files } = {}) => {
+    // const createOrUpdate = async (user, { files } = {}) => {
 
-        // Find Existing STUDIO PROFILE for User
-        const existingProfile = await profileQuery.findOne({
-            where: { user: { email: user.email } }, populate: ['user']
+    //     // Find Existing STUDIO PROFILE for User
+    //     const existingProfile = await profileQuery.findOne({
+    //         where: { user: { email: user.email } }, populate: ['user']
+    //     });
+    //     const profile = await existingProfile;
+
+    //     // Prepare Profile Entry
+    //     let entry = { empty: true };
+
+    //     if (!profile) {
+    //         //If no Profile exists for User
+    //         const ts = new Date().getTime();
+    //         const existingUser = await userQuery.findOne({
+    //             select: '*',
+    //             where: { email: user.email },
+    //             populate: { category: true },
+    //         });
+
+    //         // Create Studio Profile
+    //         const identifier = existingUser.email.replace("@", "_").replace(".", "_");
+
+    //         const profileData = {
+    //             user: existingUser,
+    //             name: existingUser.email,
+    //             identifier: identifier,
+    //             firstLogin: ts,
+    //             lastLogin: ts,
+    //             loginCount: 1,
+    //             active: true
+    //         }
+
+    //         // console.log("PROFILE", { profileData })
+
+    //         entry = await strapi.entityService.create('plugin::studio-profile.profile', {
+    //             data: profileData
+    //         });
+
+
+    //     } else {
+    //         // Otherwise Update existing Studio Profile
+    //         let { loginCount } = profile;
+    //         const profileUpdate = {
+    //             ...profile,
+    //             lastLogin: ts,
+    //             loginCount: ++loginCount
+    //         }
+    //         entry = await profileQuery.update({
+    //             where: { id: profile.id },
+    //             data: { ...profileUpdate }
+    //         });
+    //     }
+
+    //     // console.log({ entry });
+    //     return entry;
+    // }
+
+    const verifyProfile = async ({ token }) => {
+        const { jwt, email } = token;
+        const jwtVerified = await strapi.plugins['users-permissions'].services.jwt.verify(jwt);
+        // console.log("to VERIFY....", { token, jwtVerified })
+
+        if (jwtVerified) {
+            const existingUser = await getStudioUser(email);
+
+            console.log("verify", { email, existingUser })
+            // console.log("VERIFY:PROFILE_SERVICE", { token, jwtVerified })
+
+            if (existingUser.email) {
+                if (existingUser.email === token.email) {
+                    try {
+
+                        // TODO: REMOVE THIS CODE IT SHOULD NOT BE USED.
+                        // const identifierData = { "email": user.email };
+                        // const identifier = user.email.replace("@", "_").replace(".", "_");
+
+                        // const studioUser = await strapi.plugins['users-permissions'].services.user.fetch(token.id);
+                        // const profile = await studioUser;
+
+                        // const studioProfile = await profileQuery.findOne({
+                        //     where: { user: { email: profile.email } },
+                        //     populate: { user: true },
+                        // });
+                        // console.log("TO CREATE OR UPDATE________________________________________")
+                        const studioProfile = await createOrUpdateProfile(token);
+                        return studioProfile;
+                    } catch (error) {
+                        ctx.send("ERROR", error)
+                    }
+                } else {
+                    ctx.send({ error: "Incorrect parameters : Email Mismatch" })
+                }
+            } else {
+                ctx.send({ error: "Incorrect parameters : Missing Email" })
+            }
+        }
+
+
+    }
+
+
+    const createOrUpdateProfile = async (token) => {
+        const { email, site } = token;
+        // console.log("CREATE OR UPDATE PROFILE", { email, site })
+
+
+        const studioProfile = await profileQuery.findMany({
+            where: {
+                $and: [
+                    { user: { email: email } },
+                    { website: { uid: site } }]
+            },
+            populate: {
+                user: true,
+                menus: true,
+                website: true
+            },
         });
-        const profile = await existingProfile;
 
-        // Prepare Profile Entry
-        let entry = { empty: true };
+        // If no Profile exists for User...
+        if (studioProfile.length < 1) {
 
-        if (!profile) {
-            //If no Profile exists for User
-            const ts = new Date().getTime();
-            const existingUser = await userQuery.findOne({
-                select: '*',
-                where: { email: user.email },
-                populate: { category: true },
+            // console.log("TODO: CREATE SITE SPECIFIC PROFILE")
+
+            const siteProfile = await createSiteProfile(email, site)
+
+            // console.log({ siteProfile })
+            // TODO: REMOVE THIS IT SHOULD NOT BE USED
+            // // Create Profile
+            // const profileUser = await createOrUpdate(user)
+            // // Build Results for Verified User.
+            // return {
+            //     profile: profileUser,
+            //     verified,
+            //     email: user.email,
+            //     studioToken: token.jwt
+            // }
+            return siteProfile;
+
+        } else {
+            // console.log("TIME TO UPDATE PROFLIE LOGIN COUNT-----------------")
+            // Update Studio Profile
+            const profileData = studioProfile[0];
+            let { loginCount } = profileData;
+            const { id: profileId } = profileData;
+
+            const profileUpdate = {
+                ...studioProfile,
+                lastLogin: new Date().getTime(),
+                loginCount: ++loginCount
+            }
+            const updatedProfile = await profileQuery.update({
+                where: { id: profileId },
+                data: { ...profileUpdate }
             });
+            return {
+                profile: updatedProfile,
+                verified,
+                email: updatedProfile.email,
+                studioToken: token.jwt
+            }
+        }
 
-            // Create Studio Profile
-            const identifier = existingUser.email.replace("@", "_").replace(".", "_");
+    }
+
+
+    const createSiteProfile = async (email, site) => {
+
+        try {
+            // Get Website
+            const websiteEntity = await websiteQuery.findOne({
+                where: { uid: site }, populate: ['menus']
+            });
+            const websiteData = await websiteEntity;
+
+            // Define Existing User
+            const existingUser = await getStudioUser(email);
+
+            // Define Profile Data
+            const profileIdentifier = `${site.replace("-","_")}_${existingUser.email.replace("@", "_").replace(".", "_")}`;
+
+            // Define Default Website Menus 
+            // TODO: Define method to create default menus from Studio Profile plugin SETTINGS
+            const { menus } = websiteData;
+
+            // Define 'Now' Timestamp
+            const ts = new Date().getTime();
 
             const profileData = {
                 user: existingUser,
                 name: existingUser.email,
-                identifier: identifier,
+                identifier: profileIdentifier,
+                uid: profileIdentifier,
                 firstLogin: ts,
                 lastLogin: ts,
+                menus: menus,
+                website: websiteData,
                 loginCount: 1,
                 active: true
             }
 
-            // console.log("PROFILE", { profileData })
+            // console.log("CREATING NEW PROFILE------------", { profileIdentifier })
 
-            entry = await strapi.entityService.create('plugin::studio-profile.profile', {
+            // TODO: UNCOMMENT THIS TO ACTUALLY CREATE THE PROFILE
+            const entry = await strapi.entityService.create('plugin::studio-profile.profile', {
                 data: profileData
             });
 
+            return entry;
+        
+        } catch (err) {
+            console.error(err);
+            throw new Error(err);
+        }
 
-        } else {
-            // Otherwise Update existing Studio Profile
-            let { loginCount } = profile;
-            const profileUpdate = {
-                ...profile,
-                lastLogin: ts,
-                loginCount: ++loginCount
-            }
-            entry = await profileQuery.update({
-                where: { id: profile.id },
-                data: { ...profileUpdate }
+    }
+
+
+    const getStudioUser = async (email) => {
+
+        // console.log({email})
+
+        try {
+            const existingUser = await userQuery.findOne({
+                select: '*',
+                where: { email: email },
+                populate: { category: true },
             });
-        }
 
-        // console.log({ entry });
-        return entry;
+            // console.log("EXISTING USER", { email, existingUser })
+
+            return existingUser;
+        } catch (err) {
+            console.log("ERROR:GET_STUDIO_USER", err)
+        }
     }
 
-    const verifyProfile = async (ctx) => {
-        const { user, token } = ctx.request.body;
-        const verified = await strapi.plugins['users-permissions'].services.jwt.verify(token.jwt);
+    const testMagicLink = async (ctx) => {
 
-        console.log("PROFILE_SERVICE", { user, token, verified })
 
-        if (user.email) {
-            if (user.email === token.email) {
-                try {
+        // Trigger Magic link to be sent to user
+        let didToken = await mAdmin.auth.loginWithMagicLink({ email });
 
-                    const identifierData = { "email": user.email };
-                    const identifier = user.email.replace("@", "_").replace(".", "_");
-
-                    const studioUser = await strapi.plugins['users-permissions'].services.user.fetch(token.id);
-                    const profile = await studioUser;
-
-                    const studioProfile = await profileQuery.findOne({
-                        where: { user: { email: profile.email } },
-                        populate: { user: true },
-                    });
-
-                    console.log({ studioProfile })
-
-                    if (!studioProfile) {
-                        // Create Profile
-                        const profileUser = await createOrUpdate(user)
-                        // Build Results for Verified User.
-                        return {
-                            profile: profileUser,
-                            verified,
-                            email: user.email,
-                            studioToken: token.jwt
-                        }
-                    } else {
-                        // Update Studio Profile
-                        let { loginCount } = studioProfile;
-                        const profileUpdate = {
-                            ...studioProfile,
-                            lastLogin: new Date().getTime(),
-                            loginCount: ++loginCount
-                        }
-                        const updatedProfile = await profileQuery.update({
-                            where: { id: studioProfile.id },
-                            data: { ...profileUpdate }
-                        });
-                        return {
-                            profile: updatedProfile,
-                            verified,
-                            email: updatedProfile.email,
-                            studioToken: token.jwt
-                        }
-                    }
-                } catch (error) {
-                    ctx.send("ERROR", error)
-                }
-            } else {
-                ctx.send({ error: "Incorrect parameters : Email Mismatch" })
-            }
-        } else {
-            ctx.send({ error: "Incorrect parameters : Missing Email" })
-        }
-
+        return didToken;
     }
-
-
 
     return {
         index,
         getProfile,
         verifyProfile,
-        createOrUpdate
+        testMagicLink
     }
 };

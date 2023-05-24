@@ -15,15 +15,6 @@ module.exports = [
   },
   {
     method: 'POST',
-    path: '/create',
-    handler: 'profileController.createStudioProfile',
-    config: {
-      auth: false,
-      policies: [],
-    },
-  },
-  {
-    method: 'POST',
     path: '/verify',
     handler: 'profileController.verifyStudioProfile',
     config: {
@@ -35,6 +26,15 @@ module.exports = [
     method: 'POST',
     path: '/profile',
     handler: 'profileController.getStudioProfile',
+    config: {
+      auth: false,
+      policies: [],
+    },
+  },
+  {
+    method: 'POST',
+    path: '/profile/magic',
+    handler: 'profileController.testMagicLink',
     config: {
       auth: false,
       policies: [],

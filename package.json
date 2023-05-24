@@ -1,6 +1,6 @@
 {
   "name": "@studiosymmetries/studio-profile",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "A plugin for accessing Studio Profile data.",
   "strapi": {
     "name": "studio-profile",
@@ -20,5 +20,9 @@
     "node": ">=14.19.1 <=18.x.x",
     "npm": ">=6.0.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "magic-link": "^0.0.1",
+    "magic-sdk": "^17.1.6"
+  }
 }

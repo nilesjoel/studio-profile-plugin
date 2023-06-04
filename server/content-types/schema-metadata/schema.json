@@ -4,7 +4,7 @@
   "info": {
     "singularName": "schema-metadata",
     "pluralName": "schema-metadata-elements",
-    "displayName": "Schema Metadata",
+    "displayName": "Profile Schema Metadata",
     "description": ""
   },
   "options": {

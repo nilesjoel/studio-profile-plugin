@@ -6,7 +6,7 @@
   "info": {
     "singularName": "tag",
     "pluralName": "tags",
-    "displayName": "Tag"
+    "displayName": "Profile Tag"
   },
   "options": {
     "draftAndPublish": false,

@@ -60,7 +60,29 @@ module.exports = ({ strapi }) => {
                     populate: {
                         user: true,
                         menus: true,
-                        website: true
+                        schemaMetadata: {
+                            select: ['id', 'fieldName', 'editable', 'fieldLabel', 'required', 'tableName', 'fieldType', 'gridSize', 'validators'],
+                            populate: { 'tags': { select: ['id', 'title', 'context', 'slug'] } }
+                        },
+                        website: {
+                            select: ['siteBrandName', 'name', 'uid'],
+                            populate: {
+                                pages: {
+                                    select: ['uid', 'name', 'title', 'description', 'cta'],
+                                    populate: { metadata: true, cover: { populate: true } }
+                                },
+                                webads: {
+                                    select: ['id', 'slug', 'title', 'description', 'metadata', 'cta'],
+                                    populate: { metadata: true, cover: { populate: true } }
+                                },
+                                webimages: {
+                                    select: ['id', 'slug', 'title', 'description'],
+                                    populate: { cover: { populate: true }, media: { populate: true } }
+                                },
+                                weblinks: { select: ['id','segment', 'title', 'slug'] },
+                                websocials: { select: ['id','handle', 'provider', 'slug'] }
+                            }
+                        }
                     },
                 });
                 const profileData = await studioProfile; // TODO:: what EXACTLY is happening here?
@@ -71,7 +93,7 @@ module.exports = ({ strapi }) => {
                 }
 
                 // Test : Logging
-                // console.log(profileWarn("GET PROFILE::==", { profileData, studioProfile }));
+                console.log(profileWarn("GET PROFILE::==", JSON.stringify(profileData, null, 2)));
 
                 return profileData[0];
             } catch (err) {
@@ -263,7 +285,7 @@ module.exports = ({ strapi }) => {
             const existingUser = await getStudioUser(email);
 
             // Define Profile Data
-            const profileIdentifier = `${site.replace("-","_")}_${existingUser.email.replace("@", "_").replace(".", "_")}`;
+            const profileIdentifier = `${site.replace("-", "_")}_${existingUser.email.replace("@", "_").replace(".", "_")}`;
 
             // Define Default Website Menus 
             // TODO: Define method to create default menus from Studio Profile plugin SETTINGS
@@ -293,7 +315,7 @@ module.exports = ({ strapi }) => {
             });
 
             return entry;
-        
+
         } catch (err) {
             console.error(err);
             throw new Error(err);

@@ -8,8 +8,7 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": false,
-    "comment": ""
+    "draftAndPublish": false
   },
   "attributes": {
     "fieldName": {
@@ -47,6 +46,11 @@
     },
     "gridSize": {
       "type": "decimal"
+    },
+    "tags": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::studio-profile.tag"
     }
   }
 }

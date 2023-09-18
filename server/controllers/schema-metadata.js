@@ -20,7 +20,22 @@ module.exports = ({ strapi }) => {
         }
     }
 
+
+    const createMetadata = async (ctx) => {
+
+
+        console.log("createMetadata", "------------------------", ctx.params)
+        try {
+            const { fieldName, tableName } = ctx.params;
+            ctx.body = await schemaMetadataService.createMetadata(fieldName, tableName);
+        }
+        catch (err) {
+            throw new Error("Error in getLandingPageData", err)
+        }
+    }
+
     return {
-        getMetadata
+        getMetadata,
+        createMetadata
     }
 };

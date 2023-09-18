@@ -18,7 +18,8 @@ const chalk = require('chalk');
 const error = chalk.bold.red;
 const warning = chalk.keyword('orange');
 const profileWarn = chalk.keyword('pink'); // Orange color
-
+const colorPink = chalk.keyword('pink'); // Green color
+const coverMedia = chalk.keyword('blue'); // Blue color
 
 module.exports = ({ strapi }) => {
 
@@ -51,6 +52,7 @@ module.exports = ({ strapi }) => {
             // console.log("STUDIO USER", { email, studioUser })
             // If User Token is Valid, find Studio Profile
             try {
+                console.log("GONNA TRY TO GET PROFILE", { email, token }, JSON.stringify({ "tokenEmail": token.email }))
                 const studioProfile = await profileQuery.findMany({
                     where: {
                         $and: [
@@ -65,22 +67,32 @@ module.exports = ({ strapi }) => {
                             populate: { 'tags': { select: ['id', 'title', 'context', 'slug'] } }
                         },
                         website: {
-                            select: ['siteBrandName', 'name', 'uid'],
+                            select: ['uid', 'siteBrandName', 'name'],
                             populate: {
                                 pages: {
                                     select: ['uid', 'name', 'title', 'description', 'cta'],
                                     populate: { metadata: true, cover: { populate: true } }
                                 },
                                 webads: {
-                                    select: ['id', 'slug', 'title', 'description', 'metadata', 'cta'],
-                                    populate: { metadata: true, cover: { populate: true } }
+                                    select: ['uid', 'slug', 'title', 'description', 'cta'],
+                                    populate: {
+                                        metadata: true,
+                                        cover: { populate: true }
+                                    }
                                 },
                                 webimages: {
-                                    select: ['id', 'slug', 'title', 'description'],
-                                    populate: { cover: { populate: true }, media: { populate: true } }
+                                    select: ['uid', 'slug', 'title', 'description'],
+                                    populate: {
+                                        cover: {
+                                            select: ['width', 'height', 'url', 'formats'],
+                                        },
+                                        media: {
+                                            select: ['width', 'height', 'url', 'formats']
+                                        }
+                                    }
                                 },
-                                weblinks: { select: ['id','segment', 'title', 'slug'] },
-                                websocials: { select: ['id','handle', 'provider', 'slug'] }
+                                weblinks: { select: ['uid', 'segment', 'title', 'slug'] },
+                                websocials: { select: ['uid', 'handle', 'provider', 'slug'] }
                             }
                         }
                     },
@@ -92,12 +104,76 @@ module.exports = ({ strapi }) => {
                     // TODO : Delete all profiles but the one with the most recent login.
                 }
 
+
+
+                const buildImageFormats = (formats) => {
+                    // Define Image Formats
+                    const imageFormats = Object.keys(formats);
+                    // Build Simplified Image Object
+                    const simplifiedImage = {};
+                    imageFormats.forEach((format) => {
+                        // Define Image Properties
+                        const img = formats[format];
+                        const { width, height, url, hash } = img;
+                        // Image Properties 
+                        simplifiedImage[format] = { width, height, url, hash };
+                    })
+                    return simplifiedImage;
+                }
+
+
+                const webimages = profileData[0].website?.webimages;
+
+                let webimagesSimplified = [];
+                webimages?.forEach((image) => {
+
+                    const { uid, slug, title, description, cover, media } = image;
+                    const { width, height, url, formats } = cover;
+
+                    // Build Simplified Image Object for Cover
+                    const coverImageFormats = buildImageFormats(formats);
+                    const coverImage = { ...coverImageFormats, width, height, url}
+                    // console.log(coverMedia("COVER IMAGE", JSON.stringify({ image }, null, 2)));
+
+                    // Build Simplified Image Object for Media
+                    let mediaImage = [];
+                    media.forEach((img) => {
+                        const { formats } = img;
+                        const imgFormats = buildImageFormats(formats);
+                        mediaImage[mediaImage.length] = imgFormats;
+                        // console.log(coverMedia("IMAGE MEDIA", JSON.stringify({ img }, null, 2)));
+                    });
+
+                    // console.log(coverMedia("MEDIA IMAGE", JSON.stringify({ uid, webimagesMedia }, null, 2)));
+
+                    webimagesSimplified[webimagesSimplified.length] = {
+                        uid, 
+                        slug, 
+                        title, 
+                        description, 
+                        cover : coverImage, 
+                        media : mediaImage
+                    }
+
+                })
+
+
+                // console.log(coverMedia("MEDIA IMAGE", JSON.stringify({ webimagesSimplified }, null, 2)));
+                
+                
+                profileData[0].website.webimages = webimagesSimplified;
+
+
                 // Test : Logging
-                console.log(profileWarn("GET PROFILE::==", JSON.stringify(profileData, null, 2)));
+                // console.log(profileWarn("GET PROFILE::==",
+                //     JSON.stringify(webimages, null, 2),
+                //     // Object.keys(webimagesSimplified)));
+                // ));
 
                 return profileData[0];
             } catch (err) {
-                throw new NotFoundError("Profile Not Found", "GET_PROFILE--------", { err })
+                console.log(profileWarn("ERROR:GET_PROFILE", err));
+                throw new Error("Profile Not Found", "GET_PROFILE--------", { err })
             }
 
         } else {

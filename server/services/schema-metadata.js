@@ -72,10 +72,23 @@ module.exports = ({ strapi }) => {
         }
     }
 
+    const createMetadata = async (fieldName, tableName) => {
 
+        const entry = await strapi.entityService.create('api::studio-profile.schema-metadata', {
+            data: {
+                fieldName,
+                tableName,
+            },
+        });
+        const result = entry.json();
+
+        console.log("SCHEMA METADATA SERVICE", "------------------------",
+            JSON.stringify({ result }, null, 2));
+    }
 
 
     return {
-        getMetadata
+        getMetadata,
+        createMetadata
     }
 };

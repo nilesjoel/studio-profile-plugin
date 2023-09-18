@@ -17,7 +17,7 @@ module.exports = ({ strapi }) => {
     const getStudioProfile = async (ctx) => {
         // Get Profile with Token.
         const { token } = ctx.request.body;
-        // console.log("GET STUDIO PROFILE CONTROLLER", "------------------------", { tokenEmail : token.email })
+        console.log("GET STUDIO PROFILE CONTROLLER", "------------------------", { tokenEmail : token.email })
         try{
             ctx.body = await profileService.getProfile({token});
         }catch(err){

@@ -5,5 +5,5 @@ const lifecycles = require('./lifecycles');
 
 module.exports = {
     schema,
-    lifecycles
+    // lifecycles
 }

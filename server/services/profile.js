@@ -19,7 +19,7 @@ const error = chalk.bold.red;
 const warning = chalk.keyword('orange');
 const profileWarn = chalk.keyword('pink'); // Orange color
 const colorPink = chalk.keyword('pink'); // Green color
-const coverMedia = chalk.keyword('blue'); // Blue color
+const colorBlue = chalk.keyword('blue'); // Blue color
 
 module.exports = ({ strapi }) => {
 
@@ -37,6 +37,121 @@ module.exports = ({ strapi }) => {
     }
 
 
+
+
+
+    const buildImageFormats = (formats) => {
+        // Define Image Formats
+        const imageFormats = Object.keys(formats);
+        // Build Simplified Image Object
+        const simplifiedImage = {};
+        imageFormats.forEach((format) => {
+            // Define Image Properties
+            const img = formats[format];
+            const { width, height, url, hash } = img;
+            // Image Properties 
+            simplifiedImage[format] = { width, height, url, hash };
+        })
+        return simplifiedImage;
+    }
+
+
+    const buildWebImages = (webimages) => {
+        console.log(colorPink("BUILD WEB IMAGES----------------------------------------"));
+        let webimagesSimplified = [];
+        webimages?.forEach((image) => {
+
+            const { uid, slug, title, description, cover, media } = image;
+            const { width, height, url, formats } = cover;
+
+            // Build Simplified Image Object for Cover
+            const coverImageFormats = buildImageFormats(formats);
+            const coverImage = { ...coverImageFormats, width, height, url }
+            // console.log(coverMedia("COVER IMAGE", JSON.stringify({ image }, null, 2)));
+
+            // Build Simplified Image Object for Media
+            let mediaImage = [];
+            media.forEach((img) => {
+                const { formats } = img;
+                const imgFormats = buildImageFormats(formats);
+                mediaImage[mediaImage.length] = imgFormats;
+                // console.log(coverMedia("IMAGE MEDIA", JSON.stringify({ img }, null, 2)));
+            });
+
+            // console.log(coverMedia("MEDIA IMAGE", JSON.stringify({ uid, webimagesMedia }, null, 2)));
+
+            webimagesSimplified[webimagesSimplified.length] = {
+                uid,
+                slug,
+                title,
+                description,
+                cover: coverImage,
+                media: mediaImage
+            }
+
+        })
+        return webimagesSimplified;
+    }
+
+    const buildWebAds = (webads) => {
+        console.log(colorBlue("BUILD WEB ADS----------------------------------------"));
+        let webadsSimplified = [];
+        webads?.forEach((ad) => {
+            const { uid, slug, title, description, cta, cover } = ad;
+
+            if (cover === null || cover === undefined) {
+                (webadsSimplified[webadsSimplified.length] = ad);
+                return;
+            }
+
+            const { width, height, url, formats } = cover;
+
+            // Build Simplified Image Object for Cover
+            const coverImageFormats = buildImageFormats(formats);
+            const coverImage = { width, height, url, ...coverImageFormats, }
+            webadsSimplified[webadsSimplified.length] = {
+                uid,
+                slug,
+                title,
+                description,
+                cta,
+                cover: coverImage
+            }
+
+
+
+        })
+        return webadsSimplified;
+    }
+
+    const buildPages = (pages) => {
+        console.log(colorPink("BUILD PAGES----------------------------------------"));
+        let pagesSimplified = [];
+        pages?.forEach((page) => {
+            const { uid, name, title, description, cta, metadata, cover } = page;
+
+            if (cover === null || cover === undefined) {
+                (pagesSimplified[pagesSimplified.length] = page);
+                return;
+            }
+
+            const { width, height, url, formats } = cover;
+
+            // Build Simplified Image Object for Cover
+            const coverImageFormats = buildImageFormats(formats);
+            const coverImage = {  width, height, url, ...coverImageFormats, }
+            pagesSimplified[pagesSimplified.length] = {
+                uid,
+                name,
+                title,
+                description,
+                cta,
+                metadata,
+                cover: coverImage
+            }
+        })
+        return pagesSimplified;
+    }
 
     const getProfile = async ({ token }) => {
         // console.log("getProfile::", { token })
@@ -71,7 +186,10 @@ module.exports = ({ strapi }) => {
                             populate: {
                                 pages: {
                                     select: ['uid', 'name', 'title', 'description', 'cta'],
-                                    populate: { metadata: true, cover: { populate: true } }
+                                    populate: {
+                                        metadata: true,
+                                        cover: { populate: true }
+                                    }
                                 },
                                 webads: {
                                     select: ['uid', 'slug', 'title', 'description', 'cta'],
@@ -105,63 +223,22 @@ module.exports = ({ strapi }) => {
                 }
 
 
-
-                const buildImageFormats = (formats) => {
-                    // Define Image Formats
-                    const imageFormats = Object.keys(formats);
-                    // Build Simplified Image Object
-                    const simplifiedImage = {};
-                    imageFormats.forEach((format) => {
-                        // Define Image Properties
-                        const img = formats[format];
-                        const { width, height, url, hash } = img;
-                        // Image Properties 
-                        simplifiedImage[format] = { width, height, url, hash };
-                    })
-                    return simplifiedImage;
-                }
-
-
                 const webimages = profileData[0].website?.webimages;
+                const webads = profileData[0].website?.webads;
+                const pages = profileData[0].website?.pages;
 
-                let webimagesSimplified = [];
-                webimages?.forEach((image) => {
 
-                    const { uid, slug, title, description, cover, media } = image;
-                    const { width, height, url, formats } = cover;
-
-                    // Build Simplified Image Object for Cover
-                    const coverImageFormats = buildImageFormats(formats);
-                    const coverImage = { ...coverImageFormats, width, height, url}
-                    // console.log(coverMedia("COVER IMAGE", JSON.stringify({ image }, null, 2)));
-
-                    // Build Simplified Image Object for Media
-                    let mediaImage = [];
-                    media.forEach((img) => {
-                        const { formats } = img;
-                        const imgFormats = buildImageFormats(formats);
-                        mediaImage[mediaImage.length] = imgFormats;
-                        // console.log(coverMedia("IMAGE MEDIA", JSON.stringify({ img }, null, 2)));
-                    });
-
-                    // console.log(coverMedia("MEDIA IMAGE", JSON.stringify({ uid, webimagesMedia }, null, 2)));
-
-                    webimagesSimplified[webimagesSimplified.length] = {
-                        uid, 
-                        slug, 
-                        title, 
-                        description, 
-                        cover : coverImage, 
-                        media : mediaImage
-                    }
-
-                })
 
 
                 // console.log(coverMedia("MEDIA IMAGE", JSON.stringify({ webimagesSimplified }, null, 2)));
-                
-                
+
+                const webimagesSimplified = buildWebImages(webimages);
+                const webadsSimplified = buildWebAds(webads);
+                const pagesSimplified = buildPages(pages);
+
                 profileData[0].website.webimages = webimagesSimplified;
+                profileData[0].website.webads = webadsSimplified;
+                profileData[0].website.pages = pagesSimplified;
 
 
                 // Test : Logging
@@ -169,6 +246,10 @@ module.exports = ({ strapi }) => {
                 //     JSON.stringify(webimages, null, 2),
                 //     // Object.keys(webimagesSimplified)));
                 // ));
+
+                const profileContext = {
+
+                }
 
                 return profileData[0];
             } catch (err) {

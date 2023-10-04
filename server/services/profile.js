@@ -27,6 +27,14 @@ module.exports = ({ strapi }) => {
     const userQuery = strapi.db.query('plugin::users-permissions.user');
     const websiteQuery = strapi.db.query('plugin::studio-website.website');
 
+    const webimageService = strapi.plugin("studio-website").service("webimageService");
+
+    const webadService = strapi.plugin("studio-website").service("webadService");
+
+    const webpageService = strapi.plugin("studio-website").service("webpageService");
+
+
+
     // TODO: REMOVE or REPLACE with useable code.
     // Potentially use this to list available services.
     const index = async (ctx) => {
@@ -40,118 +48,10 @@ module.exports = ({ strapi }) => {
 
 
 
-    const buildImageFormats = (formats) => {
-        // Define Image Formats
-        const imageFormats = Object.keys(formats);
-        // Build Simplified Image Object
-        const simplifiedImage = {};
-        imageFormats.forEach((format) => {
-            // Define Image Properties
-            const img = formats[format];
-            const { width, height, url, hash } = img;
-            // Image Properties 
-            simplifiedImage[format] = { width, height, url, hash };
-        })
-        return simplifiedImage;
-    }
-
-
-    const buildWebImages = (webimages) => {
-        console.log(colorPink("BUILD WEB IMAGES----------------------------------------"));
-        let webimagesSimplified = [];
-        webimages?.forEach((image) => {
-
-            const { uid, slug, title, description, cover, media } = image;
-            const { width, height, url, formats } = cover;
-
-            // Build Simplified Image Object for Cover
-            const coverImageFormats = buildImageFormats(formats);
-            const coverImage = { ...coverImageFormats, width, height, url }
-            // console.log(coverMedia("COVER IMAGE", JSON.stringify({ image }, null, 2)));
-
-            // Build Simplified Image Object for Media
-            let mediaImage = [];
-            media.forEach((img) => {
-                const { formats } = img;
-                const imgFormats = buildImageFormats(formats);
-                mediaImage[mediaImage.length] = imgFormats;
-                // console.log(coverMedia("IMAGE MEDIA", JSON.stringify({ img }, null, 2)));
-            });
-
-            // console.log(coverMedia("MEDIA IMAGE", JSON.stringify({ uid, webimagesMedia }, null, 2)));
-
-            webimagesSimplified[webimagesSimplified.length] = {
-                uid,
-                slug,
-                title,
-                description,
-                cover: coverImage,
-                media: mediaImage
-            }
-
-        })
-        return webimagesSimplified;
-    }
-
-    const buildWebAds = (webads) => {
-        console.log(colorBlue("BUILD WEB ADS----------------------------------------"));
-        let webadsSimplified = [];
-        webads?.forEach((ad) => {
-            const { uid, slug, title, description, cta, cover } = ad;
-
-            if (cover === null || cover === undefined) {
-                (webadsSimplified[webadsSimplified.length] = ad);
-                return;
-            }
-
-            const { width, height, url, formats } = cover;
-
-            // Build Simplified Image Object for Cover
-            const coverImageFormats = buildImageFormats(formats);
-            const coverImage = { width, height, url, ...coverImageFormats, }
-            webadsSimplified[webadsSimplified.length] = {
-                uid,
-                slug,
-                title,
-                description,
-                cta,
-                cover: coverImage
-            }
 
 
 
-        })
-        return webadsSimplified;
-    }
 
-    const buildPages = (pages) => {
-        console.log(colorPink("BUILD PAGES----------------------------------------"));
-        let pagesSimplified = [];
-        pages?.forEach((page) => {
-            const { uid, name, title, description, cta, metadata, cover } = page;
-
-            if (cover === null || cover === undefined) {
-                (pagesSimplified[pagesSimplified.length] = page);
-                return;
-            }
-
-            const { width, height, url, formats } = cover;
-
-            // Build Simplified Image Object for Cover
-            const coverImageFormats = buildImageFormats(formats);
-            const coverImage = {  width, height, url, ...coverImageFormats, }
-            pagesSimplified[pagesSimplified.length] = {
-                uid,
-                name,
-                title,
-                description,
-                cta,
-                metadata,
-                cover: coverImage
-            }
-        })
-        return pagesSimplified;
-    }
 
     const getProfile = async ({ token }) => {
         // console.log("getProfile::", { token })
@@ -187,6 +87,9 @@ module.exports = ({ strapi }) => {
                                 pages: {
                                     select: ['uid', 'name', 'title', 'description', 'cta'],
                                     populate: {
+                                        webads: { select: ['uid'] },
+                                        weblink: { select: ['uid'] },
+                                        webimages: { select: ['uid'] },
                                         metadata: true,
                                         cover: { populate: true }
                                     }
@@ -232,9 +135,9 @@ module.exports = ({ strapi }) => {
 
                 // console.log(coverMedia("MEDIA IMAGE", JSON.stringify({ webimagesSimplified }, null, 2)));
 
-                const webimagesSimplified = buildWebImages(webimages);
-                const webadsSimplified = buildWebAds(webads);
-                const pagesSimplified = buildPages(pages);
+                const webimagesSimplified = webimageService.buildWebImages(webimages);
+                const webadsSimplified = webadService.buildWebAds(webads);
+                const pagesSimplified = webpageService.buildPages(pages);
 
                 profileData[0].website.webimages = webimagesSimplified;
                 profileData[0].website.webads = webadsSimplified;

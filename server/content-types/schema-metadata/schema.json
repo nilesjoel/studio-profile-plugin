@@ -51,6 +51,10 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "plugin::studio-profile.tag"
+    },
+    "uid": {
+      "type": "uid",
+      "targetField": "fieldName"
     }
   }
 }

@@ -208,7 +208,7 @@ module.exports = ({ strapi }) => {
             ],
             relationships: [
                 // Expectation : Add or Remove Menus from Website
-                { entity: "menus", editable: true, required: false },
+                // { entity: "menus", editable: true, required: false },
                 // Expectation : Add or Remove Webimages from Website
                 { entity: "webimages", editable: true, required: false },
                 // Expectation : Add or Remove Weblinks from Website

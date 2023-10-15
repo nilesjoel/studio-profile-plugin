@@ -35,6 +35,9 @@
     "uid": {
       "type": "uid",
       "targetField": "title"
+    },
+    "active": {
+      "type": "boolean"
     }
   }
 }
